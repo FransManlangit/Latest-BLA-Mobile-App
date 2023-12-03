@@ -9,7 +9,6 @@ import Toast from "react-native-toast-message";
 import store from "./Redux/store";
 import { Provider } from "react-redux";
 
-
 import { NativeBaseProvider, extendTheme } from "native-base";
 
 const newColorTheme = {

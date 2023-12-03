@@ -8,6 +8,8 @@ import {
   ScrollView,
   Dimensions,
   SafeAreaView,
+  TextInput,
+  TouchableOpacity,
 } from "react-native";
 import {
   Container,
@@ -23,12 +25,19 @@ import {
   Box,
   Image,
 } from "native-base";
-import { Ionicons, MaterialIcons, SmallCloseIcon } from "@expo/vector-icons";
+import {
+  Ionicons,
+  MaterialIcons,
+  SmallCloseIcon,
+  Feather,
+} from "@expo/vector-icons";
 import DocumentList from "./DocumentList";
 import SearchedDocument from "./SearchedDocument";
 import baseURL from "../../assets/common/baseUrl";
 import axios from "axios";
-import {COLORS, SIZES} from "../../assets/constants";
+import { COLORS, SIZES } from "../../assets/constants";
+import Banner from "../../Shared/Banner";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 var { width, height } = Dimensions.get("window");
 
@@ -76,43 +85,51 @@ const DocumentContainer = () => {
   console.log(documentsFiltered);
 
   return (
-    <>
+    <KeyboardAwareScrollView>
       {loading === false ? (
         <Center>
-          <VStack w="100%" space={5} alignSelf="center">
-            <Input
-              onFocus={openList}
-              onChangeText={(text) => searchDocument(text)}
-              placeholder="Search"
-              variant="filled"
-              width="100%"
-              borderRadius="10"
-              py="1"
-              px="2"
-              InputLeftElement={
-                <Icon
-                  ml="2"
-                  size="4"
-                  color="gray.400"
-                  as={<Ionicons name="ios-search" />}
+          <View style={styles.searchContainer}>
+            <TouchableOpacity>
+              <Feather name="search" size={25} style={styles.searchIcon} />
+            </TouchableOpacity>
+            <View style={styles.searchWrapper}>
+              <TextInput
+                onFocus={openList}
+                onChangeText={(text) => searchDocument(text)}
+                placeholder="Search"
+              />
+            </View>
+            <View>
+              <TouchableOpacity 
+                style={{ ...styles.searchBtn, backgroundColor: "#EBDE70" }}
+              >
+                <Ionicons
+                  name="qr-code-outline"
+                  size={SIZES.xLarge}
+                  color={COLORS.black}
                 />
-              }
-              InputRightElement={
-                focus === true ? (
-                  <Icon
-                    ml="2"
-                    size="4"
-                    color="gray.400"
-                    as={<Ionicons name="close" size="12" color="black" />}
-                  />
-                ) : null
-              }
-            />
-          </VStack>
+              </TouchableOpacity>
+            </View>
+          </View>
           {focus === true ? (
             <SearchedDocument documentsFiltered={documentsFiltered} />
           ) : (
             <ScrollView>
+              <Box mt={4} mb={2} ml={4}>
+                {/* Apply custom styles to the Heading component */}
+                <Heading
+                  size="lg"
+                  fontWeight="bold"
+                  color={COLORS.brown}
+                  letterSpacing={1}
+                  textAlign="left"
+                >
+                  Announcement
+                </Heading>
+              </Box>
+              <View>
+                <Banner />
+              </View>
               {documents.length > 0 ? (
                 <View style={styles.listContainer}>
                   {documents.map((item) => {
@@ -132,7 +149,7 @@ const DocumentContainer = () => {
           <ActivityIndicator size="large" color="red" />
         </Container>
       )}
-    </>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -141,9 +158,9 @@ const styles = StyleSheet.create({
     width: 182,
     height: 240,
     marginEnd: 22,
-    borderRadius: 8, 
-    overflow: 'hidden',
-    backgroundColor: 'white', 
+    borderRadius: 8,
+    overflow: "hidden",
+    backgroundColor: "white",
     shadowOffset: {
       width: 0,
       height: 3,
@@ -152,15 +169,20 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 7,
   },
+  Heading: {
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+  },
   listContainer: {
     flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -SIZES.small / 2, 
-    borderRadius: 8, 
-    overflow: 'hidden',
-    backgroundColor: 'white', 
-    shadowColor: '#000',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginHorizontal: -SIZES.small / 2,
+    borderRadius: 8,
+    overflow: "hidden",
+    backgroundColor: "white",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 3,
@@ -170,11 +192,52 @@ const styles = StyleSheet.create({
     elevation: 7,
   },
   center: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
   },
-});
 
+  searchContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignContent: "center",
+    marginHorizontal: SIZES.small,
+    backgroundColor: COLORS.white,
+    borderRadius: SIZES.medium,
+    marginVertical: SIZES.medium,
+    height: 50,
+  },
+
+  searchIcon: {
+    marginHorizontal: 10,
+    color: COLORS.goldendyellow,
+    marginTop: SIZES.small,
+  },
+
+  searchWrapper: {
+    justifyContent: "center",
+    alignContent: "center",
+    flex: 1,
+    backgroundColor: COLORS.white,
+    marginRight: SIZES.small,
+    borderRadius: SIZES.small,
+  },
+
+  SearchInput: {
+    fontFamily: "regular",
+    width: "100%",
+    height: "100%",
+    paddingHorizontal: SIZES.small,
+  },
+
+  searchBtn: {
+    width: 50,
+    height: "100%",
+    borderRadius: SIZES.medium,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.primary,
+  },
+});
 
 export default DocumentContainer;

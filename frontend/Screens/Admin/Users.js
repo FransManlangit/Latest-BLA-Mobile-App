@@ -2,77 +2,93 @@ import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-  Dimensions,
-  ActivityIndicator,
   FlatList,
+  ActivityIndicator,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
   RefreshControl,
 } from "react-native";
-import { Input, VStack, Heading, Box } from "native-base";
 import { Searchbar } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useFocusEffect } from "@react-navigation/native";
-import ListItem from "./ListItem";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Box } from "native-base";
 import axios from "axios";
 import baseURL from "../../assets/common/baseUrl";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import EasyButton from "../../Shared/StyledComponents/EasyButtons";
-import { useNavigation } from "@react-navigation/native";
+import UserListView from "./UserListView";
+
 
 var { height, width } = Dimensions.get("window");
+
 const ListHeader = () => {
   return (
     <View elevation={1} style={styles.listHeader}>
-      <View style={styles.headerItem}></View>
       <View style={styles.headerItem}>
         <Text style={{ fontWeight: "600" }}>Name</Text>
       </View>
-      <View style={styles.headerItem}>
-        <Text style={{ fontWeight: "600" }}>Price</Text>
+      <View>
+      <Text style={{ fontWeight: "600" }}>         </Text>
       </View>
+      <View style={styles.headerItem}>
+        <Text style={{ fontWeight: "600" }}>Email</Text>
+      </View>
+      <View>
+      <Text style={{ fontWeight: "600" }}>        </Text>
+      </View>
+      <View style={styles.headerItem}>
+        <Text style={{ fontWeight: "600" }}>Phone</Text>
+      </View>
+      <View>
+      <Text style={{ fontWeight: "600" }}>          </Text>
+      </View> 
+      <View style={styles.headerItem}>
+        <Text style={{ fontWeight: "600" }}>Role</Text>
+      </View>
+      {/* Add other header items based on your user schema */}
     </View>
   );
 };
 
-const Documents = (props) => {
-  const [documentList, setDocumentList] = useState();
-  const [documentFilter, setDocumentFilter] = useState();
+const Users = (props) => {
+  const [userList, setUserList] = useState();
+  const [userFilter, setUserFilter] = useState();
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState();
   const [refreshing, setRefreshing] = useState(false);
-  const navigation = useNavigation();
 
-  const searchDocument = (text) => {
+  const navigation = useNavigation(); // Use useNavigation hook to get navigation object
+
+  const searchUser = (text) => {
     if (text === "") {
-      setDocumentFilter(documentList);
+      setUserFilter(userList);
     }
-    setDocumentFilter(
-      documentList.filter((i) =>
-        i.name.toLowerCase().includes(text.toLowerCase())
+    setUserFilter(
+      userList.filter((user) =>
+        user.name.toLowerCase().includes(text.toLowerCase())
       )
     );
   };
-  const deleteDocument = (id) => {
+
+  const deleteUser = (id) => {
     axios
-      .delete(`${baseURL}documents/${id}`, {
+      .delete(`${baseURL}users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        const documents = documentFilter.filter((item) => item.id !== id);
-        setDocumenttFilter(documents);
+        const users = userFilter.filter((item) => item.id !== id);
+        setUserFilter(users);
       })
       .catch((error) => console.log(error));
   };
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      axios.get(`${baseURL}documents`).then((res) => {
-        // console.log(res.data)
-        setDocumentList(res.data);
-        setDocumentFilter(res.data);
+      axios.get(`${baseURL}users`).then((res) => {
+        setUserList(res.data);
+        setUserFilter(res.data);
         setLoading(false);
       });
       setRefreshing(false);
@@ -81,23 +97,21 @@ const Documents = (props) => {
 
   useFocusEffect(
     useCallback(() => {
-      // Get Token
       AsyncStorage.getItem("jwt")
         .then((res) => {
           setToken(res);
         })
         .catch((error) => console.log(error));
 
-      axios.get(`${baseURL}documents`).then((res) => {
-        console.log(res.data);
-        setDocumentList(res.data);
-        setDocumentFilter(res.data);
+      axios.get(`${baseURL}users`).then((res) => {
+        setUserList(res.data);
+        setUserFilter(res.data);
         setLoading(false);
       });
 
       return () => {
-        setDocumentList();
-        setDocumentFilter();
+        setUserList();
+        setUserFilter();
         setLoading(true);
       };
     }, [])
@@ -105,36 +119,10 @@ const Documents = (props) => {
 
   return (
     <Box flex={1}>
-      <View style={styles.buttonContainer}>
-        <EasyButton
-          secondary
-          medium
-          onPress={() => navigation.navigate("Requests")}
-        >
-          <Icon name="shopping-bag" size={18} color="white" />
-          <Text style={styles.buttonText}>Requests</Text>
-        </EasyButton>
-        <EasyButton
-          secondary
-          medium
-          onPress={() => navigation.navigate("DocumentForm")}
-        >
-          <Icon name="plus" size={18} color="white" />
-          <Text style={styles.buttonText}>Documents</Text>
-        </EasyButton>
-        <EasyButton
-          secondary
-          medium
-          onPress={() => navigation.navigate("Users")}
-        >
-          <Icon name="user" size={18} color="white" />
-          <Text style={styles.buttonText}>Users</Text>
-        </EasyButton>
-      </View>
       <Searchbar
         width="80%"
         placeholder="Search"
-        onChangeText={(text) => searchDocument(text)}
+        onChangeText={(text) => searchUser(text)}
       />
       {loading ? (
         <View style={styles.spinner}>
@@ -142,16 +130,16 @@ const Documents = (props) => {
         </View>
       ) : (
         <FlatList
-          data={documentFilter}
+          data={userFilter}
           ListHeaderComponent={ListHeader}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           renderItem={({ item, index }) => (
-            <ListItem
+            <UserListView
               item={item}
               index={index}
-              deleteDocument={deleteDocument}
+              deleteUser={deleteUser}
             />
           )}
           keyExtractor={(item) => item.id}
@@ -176,10 +164,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  container: {
-    marginBottom: 160,
-    backgroundColor: "white",
-  },
   buttonContainer: {
     margin: 20,
     alignSelf: "center",
@@ -191,4 +175,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Documents;
+export default Users;

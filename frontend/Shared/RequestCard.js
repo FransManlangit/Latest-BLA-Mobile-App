@@ -11,11 +11,13 @@ import axios from 'axios';
 import baseURL from "../assets/common/baseUrl";
 import { useNavigation } from "@react-navigation/native";
 
+// Define status codes
 const codes = [
-  { name: "pending", code: "3" },
-  { name: "processing", code: "2" },
-  { name: "recieved", code: "1" },
+  { name: "pending", code: "pending" },
+  { name: "processing", code: "processing" },
+  { name: "received", code: "received" }, // Corrected spelling
 ];
+
 const RequestCard = ({ item }) => {
   const [requestStatus, setRequestStatus] = useState();
   const [statusText, setStatusText] = useState();
@@ -24,19 +26,28 @@ const RequestCard = ({ item }) => {
   const [cardColor, setCardColor] = useState();
   const navigation = useNavigation();
 
+  // Function to update the request
   const updateRequest = () => {
+    // Retrieve token using async storage
     AsyncStorage.getItem("jwt")
-            .then((res) => {
-                setToken(res);
-            })
-            .catch((error) => console.log(error));
+      .then((res) => {
+        setToken(res);
+      })
+      .catch((error) => console.log(error));
+
+    // Define request configuration
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    };
+
+    // Prepare request data
     const request = {
       fullname: item.fullname,
+      studentId: item.studentId, // Corrected spelling
+      section: item.section,
+      grade: item.grade,
       dateofRequest: item.dateofRequest,
       id: item.id,
       requestItems: item.requestItems,
@@ -46,55 +57,59 @@ const RequestCard = ({ item }) => {
       user: item.user,
       purpose: item.purpose,
     };
+
+    // Make the PUT request
     axios
-    .put(`${baseURL}requests/${item.id}`, request, config)
-    .then((res) => {
-      if (res.status == 200 || res.status == 201) {
+      .put(`${baseURL}requests/${item.id}`, request, config)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          Toast.show({
+            topOffset: 60,
+            type: "success",
+            text1: "Request Edited",
+            text2: "",
+          });
+          setTimeout(() => {
+            navigation.navigate("Requests");
+          }, 500);
+        }
+      })
+      .catch((error) => {
         Toast.show({
           topOffset: 60,
-          type: "success",
-          text1: "Request Edited",
-          text2: "",
+          type: "error",
+          text1: "Something went wrong",
+          text2: "Please try again",
         });
-        setTimeout(() => {
-          navigation.navigate("Requests");
-        }, 500);
-      }
-    })
-    .catch((error) => {
-      Toast.show({
-        topOffset: 60,
-        type: "error",
-        text1: "Something went wrong",
-        text2: "Please try again",
       });
-    });
-}
+  };
+
   useEffect(() => {
-    if (item.status == "3") {
-      setRequestStatus(<TrafficLight unavailable></TrafficLight>);
+    // Set request status and card color based on item status
+    if (item.status === "pending") {
+      setRequestStatus(<TrafficLight pending />);
       setStatusText("pending");
       setCardColor("#E74C3C");
-    } else if (item.status == "2") {
-      setRequestStatus(<TrafficLight limited></TrafficLight>);
+    } else if (item.status === "processing") {
+      setRequestStatus(<TrafficLight processing />);
       setStatusText("processing");
       setCardColor("#F1C40F");
-    } else { if (item.status == "1")
-      setRequestStatus(<TrafficLight available></TrafficLight>);
+    } else if (item.status === "received") {
+      setRequestStatus(<TrafficLight received />);
       setStatusText("received");
       setCardColor("#2ECC71");
     }
 
+    // Cleanup function
     return () => {
-      setRequestStatus();
-      setStatusText();
-      setCardColor();
+      setRequestStatus(null);
+      setStatusText(null);
+      setCardColor(null);
     };
   }, []);
 
   return (
-
-    <View style={[{ backgroundColor: cardColor }, styles.container]}>
+    <View style={[styles.container, { backgroundColor: cardColor }]}>
       <View style={styles.container}>
         <Text>Request Number: #{item.id}</Text>
       </View>
@@ -102,38 +117,32 @@ const RequestCard = ({ item }) => {
         <Text>
           Status: {statusText} {requestStatus}
         </Text>
-
         <Text>Fullname: {item.fullname}</Text>
-   
         <Text>Date of Request: {item.dateofRequest.split("T")[0]}</Text>
-        <View style={styles.priceContainer}>
-          <Text>Price: </Text>
-          <Text style={styles.price}>$ {item.totalPrice}</Text>
-        </View>
-        {/* {item.editMode ? ( */}
+        <Text style={styles.price}>Total Price = {item.totalPrice}</Text>
+        
         <View>
           <Select
             width="80%"
             iosIcon={<Icon name="arrow-down" color={"#007aff"} />}
             style={{ width: undefined }}
             selectedValue={statusChange}
-            color="white"
+            color="black"
             placeholder="Change Status"
-            placeholderTextColor="white"
-            placeholderStyle={{ color: "#FFFFFF" }}
+            placeholderTextColor="gray"
+            placeholderStyle={{ color: "#58595B" }}
             placeholderIconColor="#007aff"
             onValueChange={(e) => setStatusChange(e)}
           >
-            {codes.map((c) => {
-              return <Select.Item key={c.code} label={c.name} value={c.code} />;
-            })}
+            {codes.map((c) => (
+              <Select.Item key={c.code} label={c.name} value={c.code} />
+            ))}
           </Select>
 
           <EasyButton secondary large onPress={() => updateRequest()}>
             <Text style={{ color: "white" }}>Update</Text>
           </EasyButton>
         </View>
-        {/* //   ) : null} */}
       </View>
     </View>
   );
@@ -145,17 +154,13 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 10,
   },
-  title: {
-    backgroundColor: "#62B1F6",
-    padding: 5,
-  },
   priceContainer: {
     marginTop: 10,
     alignSelf: "flex-end",
     flexDirection: "row",
   },
   price: {
-    color: "white",
+    color: "black",
     fontWeight: "bold",
   },
 });

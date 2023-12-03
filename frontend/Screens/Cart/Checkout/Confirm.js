@@ -68,9 +68,14 @@ const Confirm = (props) => {
         {props.route.params ? (
           <View style={{ borderWidth: 1, borderColor: "orange" }}>
             <View style={{ padding: 8 }}>
+              <Text>StudentId: {finalRequest.request.request.studentId}</Text>
+              <Text>Grade: {finalRequest.request.request.grade}</Text>
+              <Text>Section: {finalRequest.request.request.section}</Text>
               <Text>Fullname: {finalRequest.request.request.fullname}</Text>
               <Text>Phone: {finalRequest.request.request.phone}</Text>
               <Text>purpose: {finalRequest.request.request.purpose}</Text>
+              <Text>Total Price: {finalRequest.request.request.totalPrice}</Text>
+              
             </View>
             <Text style={styles.title}>items</Text>
 

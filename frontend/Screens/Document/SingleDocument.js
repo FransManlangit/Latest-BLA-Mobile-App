@@ -24,10 +24,10 @@ const SingleDocument = ({ route, navigation }) => {
   const [availability, setAvailability] = useState(null);
   const [availabilityText, setAvailabilityText] = useState("");
   const dispatch = useDispatch();
+  
 
   useEffect(() => {
     setAvailabilityText(item.countInStock === 0 ? "Unavailable" : "Available");
-
     setAvailability(
       item.countInStock === 0 ? (
         <TrafficLight unavailable></TrafficLight>
@@ -84,7 +84,7 @@ const SingleDocument = ({ route, navigation }) => {
           Toast.show({
             topOffset: 60,
             type: "success",
-            text1: `${item.name} added to Cart`,
+            text1: `${item.name} added to Request`,
             text2: "Go to your cart to complete the request",
           });
         }}
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   cartTitle: {
     fontFamily: "semibold",
     fontSize: SIZES.medium,
-    color: COLORS.lightWhite,
+    color: COLORS.black,
   },
 
   priceWrapper: {

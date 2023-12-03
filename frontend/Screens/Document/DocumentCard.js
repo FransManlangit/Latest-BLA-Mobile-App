@@ -23,6 +23,7 @@ const DocumentCard = (props) => {
  
 
   return (
+   
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
@@ -47,11 +48,11 @@ const DocumentCard = (props) => {
                 Toast.show({
                   topOffset: 60,
                   type: "success",
-                  text1: `${name} added to Document`,
+                  text1: `${name} added to Request`,
                   text2: "Go to your cart to complete request",
                 });
             }}
-            name="add-circle"
+            name="push-outline"
             size={35}
             color={COLORS.brown}
           />
@@ -67,12 +68,12 @@ const styles = StyleSheet.create({
     width: width / 2 - 20,
     height: width / 1.7,
     padding: 10,
-    borderRadius: 10,
-    marginTop: 55,
+    borderRadius: 20,
+    marginTop: 35,
     marginBottom: 5,
     marginLeft: 10,
     alignItems: 'center',
-    backgroundColor: COLORS.secondary,
+    backgroundColor: COLORS.yellow,
   
   },
 

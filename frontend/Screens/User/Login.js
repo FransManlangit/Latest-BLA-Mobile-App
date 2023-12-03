@@ -53,8 +53,8 @@ AsyncStorage.getAllKeys((err, keys) => {
 
   return (
   
-    
-    <View className="bg-white h-full w-full">
+
+    <View className=" flex-1 justify-center bg-white h-full w-full">
         <StatusBar style="light"/>
         <Image className="h-full w-full absolute" source={require('../../assets/background.png')}/>
       
@@ -99,7 +99,7 @@ AsyncStorage.getAllKeys((err, keys) => {
         </Animated.View>
       </View>
     </View>
-</View>
+</View >
 
 )}; 
 
