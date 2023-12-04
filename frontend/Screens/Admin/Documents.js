@@ -11,7 +11,7 @@ import {
   FlatList,
   RefreshControl,
 } from "react-native";
-import { Input, VStack, Heading, Box } from "native-base";
+import { Input, VStack, Heading, Box} from "native-base";
 import { Searchbar } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useFocusEffect } from "@react-navigation/native";
@@ -21,6 +21,7 @@ import baseURL from "../../assets/common/baseUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EasyButton from "../../Shared/StyledComponents/EasyButtons";
 import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 var { height, width } = Dimensions.get("window");
 const ListHeader = () => {
@@ -62,7 +63,13 @@ const Documents = (props) => {
       })
       .then((res) => {
         const documents = documentFilter.filter((item) => item.id !== id);
-        setDocumenttFilter(documents);
+        setDocumentFilter(documents);
+        Toast.show({
+          topOffset: 60,
+          type: "success",
+          text1: "Document Deleted Succesfully",
+          text2: "Please Login into your account",
+        });
       })
       .catch((error) => console.log(error));
   };
@@ -86,10 +93,10 @@ const Documents = (props) => {
         .then((res) => {
           setToken(res);
         })
-        .catch((error) => console.log(error));
+        // .catch((error) => console.log(error));
 
       axios.get(`${baseURL}documents`).then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         setDocumentList(res.data);
         setDocumentFilter(res.data);
         setLoading(false);

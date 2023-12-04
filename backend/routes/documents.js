@@ -137,6 +137,19 @@ router.get(`/`, async (req, res) => {
     res.send(documentList);
 });
 
+router.delete('/:id', (req, res)=>{
+    console.log(req.body)
+    Document.findByIdAndRemove(req.params.id).then(document =>{
+        if(document) {
+            return res.status(200).json({success: true, message: 'the document is deleted!'})
+        } else {
+            return res.status(404).json({success: false , message: "document not found!"})
+        }
+    }).catch(err=>{
+       return res.status(500).json({success: false, error: err}) 
+    })
+})
+
 
 module.exports=router;
 

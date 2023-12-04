@@ -130,7 +130,7 @@ return (
                     secondary
                     medium 
                     onPress={() => navigation.navigate('Checkout')}>
-                    <Text style={{ color: 'white' }}>Checkout</Text>
+                    <Text style={{ color: 'white' }}>Request</Text>
                 </EasyButton>
                 {/* <Button alignItems="center" colorScheme="primary" onPress={() => navigation.navigate('Checkout')}>Check Out</Button> */}
             </HStack>
